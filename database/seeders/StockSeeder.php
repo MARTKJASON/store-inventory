@@ -1,4 +1,4 @@
-<?
+<?php
 // database/seeders/StockSeeder.php
 
 namespace Database\Seeders;
@@ -18,8 +18,8 @@ class StockSeeder extends Seeder
 
         foreach (range(1, 10) as $index) {
             DB::table('stocks')->insert([
-                'product_id' => $faker->numberBetween(3, 12), // Assuming product IDs are between 1 and 10
-                'supplier_id' => $faker->numberBetween(1, 12), // Assuming supplier IDs are between 1 and 10
+                'product_id' => $faker->numberBetween(1, 10), // Assuming product IDs are between 1 and 10
+                'supplier_id' => $faker->numberBetween(1, 10), // Assuming supplier IDs are between 1 and 10
                 'quantity' => $faker->numberBetween(10, 100),  // Random quantity between 10 and 100
             ]);
         }
