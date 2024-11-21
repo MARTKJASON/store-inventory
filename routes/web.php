@@ -17,3 +17,6 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('test'); // This will get component Test.jsx from the resources/js/Pages/Test.jsx
 });
+Route::get('/categories', function () {
+    return Inertia::render('categories'); // This will get component Test.jsx from the resources/js/Pages/Test.jsx
+});

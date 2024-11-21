@@ -13,9 +13,12 @@
         "vite": "^5.4.11"
     },
     "dependencies": {
+        "@emotion/react": "^11.13.5",
+        "@emotion/styled": "^11.13.5",
         "@inertiajs/inertia": "^0.11.1",
         "@inertiajs/inertia-react": "^0.8.1",
         "@inertiajs/react": "^1.2.0",
+        "@mui/material": "^6.1.8",
         "@vitejs/plugin-react": "^4.3.3",
         "react": "^18.3.1",
         "react-dom": "^18.3.1"

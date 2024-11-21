@@ -16,7 +16,6 @@ class Product extends Model
     protected $fillable = [
         'product_name', // Product name
         'category_id',  // Foreign key for category
-        'supplier_id',  // Foreign key for supplier
         'pricing',      // Product price
     ];
 
@@ -31,8 +30,4 @@ class Product extends Model
     /**
      * Get the supplier that owns the product.
      */
-    public function supplier()
-    {
-        return $this->belongsTo(Supplier::class, 'supplier_id');
-    }
 }

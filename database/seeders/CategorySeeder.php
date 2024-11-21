@@ -20,7 +20,7 @@ class CategorySeeder extends Seeder
             DB::table('categories')->insert([
                 'category_name' => $faker->word,
                 'notes' => $faker->sentence,
-                'description' => $faker->paragraph,
+                'description' => $faker->sentence,
             ]);
         }
     }
