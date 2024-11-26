@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -17,6 +18,7 @@ use Inertia\Inertia;
 Route::get('/', function () {
     return Inertia::render('test'); // This will get component Test.jsx from the resources/js/Pages/Test.jsx
 });
+Route::post('/products/create', [ProductController::class, 'store']);
 Route::get('/categories', function () {
     return Inertia::render('categories'); // This will get component Test.jsx from the resources/js/Pages/Test.jsx
 });

@@ -22,8 +22,7 @@ interface EditProductDrawerProps {
     }) => void;
     categories: number[]; // List of category options
     selected: number[];
-    products: any
-
+    products: any;
 }
 
 const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
@@ -36,33 +35,35 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
 }) => {
     const [productName, setProductName] = useState("");
     const [category, setCategory] = useState<string | undefined>("");
-    const [pricing, setPricing] = useState<number |  "" >("");
-    const {categoriesData } = useFetchCategories()
+    const [pricing, setPricing] = useState<number | "">("");
+    const { categoriesData } = useFetchCategories();
+
+    const selectedProduct = products.find((p: any) => p.id === selected[0]);
 
     useEffect(() => {
         if (selected.length === 1) {
-          // Find the selected product
-          const selectedProduct = products.find((p:any) => p.id === selected[0]);
-          if (selectedProduct) {
-            const selectedCategory = categoriesData.find((cat:any) => cat.id === selectedProduct.category_id)
-
-            setProductName(selectedProduct.product_name || "");
-            setCategory(selectedCategory?.category_name);
-            setPricing(selectedProduct.pricing || "");
-          }
+            // Find the selected product
+            if (selectedProduct) {
+                const selectedCategory = categoriesData.find(
+                    (cat: any) => cat.id === selectedProduct.category_id,
+                );
+                setProductName(selectedProduct.product_name || "");
+                setCategory(selectedCategory?.category_name);
+                setPricing(selectedProduct.pricing || "");
+            }
+        } else {
+            setProductName("");
         }
-      }, [selected, products]);
+    }, [selected, products]);
 
-
-
-      const handleSave = () => {
+    const handleSave = () => {
         onSave({
-          productName,
-          category,
-          pricing,
+            productName,
+            category,
+            pricing,
         });
         onClose(); // Close the drawer after saving
-      };
+    };
 
     return (
         <Drawer
@@ -93,19 +94,20 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                     label="Product Name"
                     value={productName}
                     onChange={(e) => setProductName(e.target.value)}
+                    disabled={selected.length > 1}
                 />
                 <FormControl fullWidth margin="normal">
                     <InputLabel>Category</InputLabel>
                     <Select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-          >
-            {categories.map((category) => (
-              <MenuItem key={category} value={category}>
-                {category}
-              </MenuItem>
-            ))}
-          </Select>
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                    >
+                        {categories.map((category) => (
+                            <MenuItem key={category} value={category}>
+                                {category}
+                            </MenuItem>
+                        ))}
+                    </Select>
                 </FormControl>
                 <TextField
                     fullWidth
@@ -114,8 +116,10 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                     type="number"
                     value={pricing}
                     onChange={(e) =>
-                        setPricing(e.target.value === "" ? "" : Number(e.target.value))
-                      }
+                        setPricing(
+                            e.target.value === "" ? "" : Number(e.target.value),
+                        )
+                    }
                 />
                 <Box
                     sx={{

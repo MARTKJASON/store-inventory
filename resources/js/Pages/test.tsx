@@ -7,6 +7,7 @@ import useFetchProducts from "../Hooks/useFetchProducts.js";
 import AddProductDrawer from "../Components/AddProduct.js";
 import EditProductDrawer from "../Components/EditProduct.js";
 import useFetchCategories from "../Hooks/useFetchCategories.js";
+import { router } from "@inertiajs/react";
 
 const Test = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -17,19 +18,38 @@ const Test = () => {
     const [selected, setSelected] = useState<number[]>([]);
     const [isAllSelected, setIsAllSelected] = useState(false);
     const [searchQuery, setSearchQuery] = useState(""); // Search query state
-    const { products, filteredProducts, setFilteredProducts } =
+    const { products, filteredProducts, setFilteredProducts , loading} =
         useFetchProducts();
     const { categoriesData, categoryNames } = useFetchCategories();
 
 
+
+
     const handleAddProduct = (product: {
         productName: string;
-        category: any;
+        categoryId: number | undefined;
         pricing: number | null;
     }) => {
-        console.log("New Product:", product);
-        setSelected([]);
+
+
+        // Prepare payload for the backend
+        const payload = {
+            product_name: product.productName,
+            category_id: product.categoryId, // Assuming `category` has an `id` field
+            pricing: product.pricing,
+        };
+
+        // Send the payload to the backend using router.post
+        axios.post("/products/create", payload)
+        .then(() => {
+            window.location.reload();
+            setSelected([]);
+        })
+        .catch((error) => {
+            console.error("Error saving product:", error.response?.data || error.message);
+        });
     };
+
 
     const handleEdit = (product: {
         productName: string;
@@ -151,11 +171,20 @@ const Test = () => {
 
                     <Button
                         variant="contained"
-                        color="primary"
+                        color="info"
                         onClick={() => setEditIsPopupOpen(true)}
                         disabled={selected.length === 0}
                     >
                         Edit Product({selected.length})
+                    </Button>
+
+                    <Button
+                        variant="contained"
+                        color="error"
+                        onClick={() => setEditIsPopupOpen(true)}
+                        disabled={selected.length === 0}
+                    >
+                        Delete ({selected.length})
                     </Button>
 
                     {/* Search Input */}
@@ -179,6 +208,7 @@ const Test = () => {
                     handleSelect={handleSelect}
                     filteredProducts={filteredProducts}
                     getCategoryName={getCategoryName}
+                    isLoading={loading}
                 />
             </div>
         </div>
