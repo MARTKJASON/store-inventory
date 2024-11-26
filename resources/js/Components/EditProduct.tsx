@@ -16,8 +16,9 @@ interface EditProductDrawerProps {
     open: boolean;
     onClose: () => void;
     onSave: (product: {
+        id: number | null;
         productName: string;
-        category: string | undefined;
+        categoryId: number | undefined;
         pricing: number | "";
     }) => void;
     categories: number[]; // List of category options
@@ -36,31 +37,48 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
     const [productName, setProductName] = useState("");
     const [category, setCategory] = useState<string | undefined>("");
     const [pricing, setPricing] = useState<number | "">("");
+    const [categoryId, setCategoryId] = useState<number | undefined>();
     const { categoriesData } = useFetchCategories();
-
-    const selectedProduct = products.find((p: any) => p.id === selected[0]);
+    const [productId, setProductId] = useState<number | null>(null);
 
     useEffect(() => {
         if (selected.length === 1) {
             // Find the selected product
+            const selectedProduct = products.find(
+                (p: any) => p.id === selected[0],
+            );
+
             if (selectedProduct) {
+                // Find the corresponding category
                 const selectedCategory = categoriesData.find(
-                    (cat: any) => cat.id === selectedProduct.category_id,
+                    (cat: any) =>
+                        cat.id === selectedProduct.category_id,
                 );
+
+                setProductId(selectedProduct.id);
                 setProductName(selectedProduct.product_name || "");
-                setCategory(selectedCategory?.category_name);
                 setPricing(selectedProduct.pricing || "");
+                setCategory(selectedCategory?.category_name)
+                setCategoryId(selectedCategory?.id);
             }
-        } else {
-            setProductName("");
         }
-    }, [selected, products]);
+    }, [selected, ]);
+
+    const handleGetNewCategory = (e: any) => {
+        const selectedCategoryName = e.target.value;
+        const selectedCategory = categoriesData.find(
+            (cat: any) => cat.category_name === selectedCategoryName,
+        );
+        setCategory(selectedCategoryName); // Update the selected category name
+        setCategoryId(selectedCategory?.id)
+    };
 
     const handleSave = () => {
         onSave({
+            id: productId,
             productName,
-            category,
-            pricing,
+            categoryId,
+            pricing: Number(pricing),
         });
         onClose(); // Close the drawer after saving
     };
@@ -100,7 +118,7 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                     <InputLabel>Category</InputLabel>
                     <Select
                         value={category}
-                        onChange={(e) => setCategory(e.target.value)}
+                        onChange={handleGetNewCategory}
                     >
                         {categories.map((category) => (
                             <MenuItem key={category} value={category}>

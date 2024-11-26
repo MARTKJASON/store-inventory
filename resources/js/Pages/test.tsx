@@ -8,6 +8,7 @@ import AddProductDrawer from "../Components/AddProduct.js";
 import EditProductDrawer from "../Components/EditProduct.js";
 import useFetchCategories from "../Hooks/useFetchCategories.js";
 import { router } from "@inertiajs/react";
+import { Inertia } from "@inertiajs/inertia";
 
 const Test = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -18,20 +19,15 @@ const Test = () => {
     const [selected, setSelected] = useState<number[]>([]);
     const [isAllSelected, setIsAllSelected] = useState(false);
     const [searchQuery, setSearchQuery] = useState(""); // Search query state
-    const { products, filteredProducts, setFilteredProducts , loading} =
+    const { products, filteredProducts, setFilteredProducts, loading } =
         useFetchProducts();
     const { categoriesData, categoryNames } = useFetchCategories();
-
-
-
 
     const handleAddProduct = (product: {
         productName: string;
         categoryId: number | undefined;
         pricing: number | null;
     }) => {
-
-
         // Prepare payload for the backend
         const payload = {
             product_name: product.productName,
@@ -40,23 +36,47 @@ const Test = () => {
         };
 
         // Send the payload to the backend using router.post
-        axios.post("/products/create", payload)
-        .then(() => {
-            window.location.reload();
-            setSelected([]);
-        })
-        .catch((error) => {
-            console.error("Error saving product:", error.response?.data || error.message);
-        });
+        axios
+            .post("/products/create", payload)
+            .then(() => {
+                window.location.reload();
+                setSelected([]);
+            })
+            .catch((error) => {
+                console.error(
+                    "Error saving product:",
+                    error.response?.data || error.message,
+                );
+            });
     };
 
-
     const handleEdit = (product: {
+        id: number | null;
         productName: string;
-        category: string | undefined;
+        categoryId: number | undefined;
         pricing: number | "";
     }) => {
-        console.log("edit Product:", product);
+        const payload = {
+            id: product.id,
+            product_name: product.productName,
+            category_id: product.categoryId,
+            pricing: product.pricing,
+        };
+
+        console.log(payload);
+
+        axios
+            .put(`/products/${product.id}`, payload)
+            .then(() => {
+                window.location.reload();
+                setSelected([]);
+            })
+            .catch((error) => {
+                console.error(
+                    "Error saving edit product:",
+                    error.response?.data || error.message,
+                );
+            });
     };
 
     useEffect(() => {
@@ -71,7 +91,6 @@ const Test = () => {
             setPricing(testing?.pricing);
         }
     }, [selected]);
-
 
     const handleSelectAll = (
         event: React.ChangeEvent<HTMLInputElement>,
@@ -107,7 +126,9 @@ const Test = () => {
     };
 
     const getCategoryName = (categoryId: any) => {
-        const category = categoriesData.find((cat: any) => cat.id === categoryId);
+        const category = categoriesData.find(
+            (cat: any) => cat.id === categoryId,
+        );
         return category ? category.category_name : "N/A";
     };
 
@@ -124,6 +145,17 @@ const Test = () => {
         );
         setFilteredProducts(filtered);
     }, [searchQuery, products]);
+
+    const deleteSelectedProducts = async (ids: number[]) => {
+        try {
+            await Inertia.post("/products/bulk-destroy", { ids: selected });
+
+            setSelected([]);
+            window.location.reload();
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -173,15 +205,17 @@ const Test = () => {
                         variant="contained"
                         color="info"
                         onClick={() => setEditIsPopupOpen(true)}
-                        disabled={selected.length === 0}
+                        disabled={selected.length === 0 || selected.length > 1}
                     >
-                        Edit Product({selected.length})
+                        Edit Product
                     </Button>
 
                     <Button
                         variant="contained"
                         color="error"
-                        onClick={() => setEditIsPopupOpen(true)}
+                        onClick={() => {
+                            deleteSelectedProducts(selected);
+                        }}
                         disabled={selected.length === 0}
                     >
                         Delete ({selected.length})

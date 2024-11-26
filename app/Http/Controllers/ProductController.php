@@ -38,13 +38,15 @@ class ProductController extends Controller
          $product = Product::findOrFail($id); // Find the product to update
 
          $validated = $request->validate([
-             'name' => 'required|string|max:255',
-             'price' => 'required|numeric',
+             'product_name' => 'string|max:255',
+             'category_id' => 'numeric',
+             'pricing' => 'numeric|min:0|max:9999999999.99',
          ]);
 
          $product->update($validated); // Update the product with new data
          return response()->json($product);  // Return the updated product
      }
+
 
      // Method to delete a product
      public function destroy($id)
@@ -52,5 +54,15 @@ class ProductController extends Controller
          $product = Product::findOrFail($id); // Find the product to delete
          $product->delete();  // Delete the product
          return response()->json(['message' => 'Product deleted successfully']);
+     }
+
+     public function bulkDestroy(Request $request)
+     {
+        $request->validate([
+            'ids' => 'required|array',
+            'ids*' => 'integer|exist:products,id'
+        ]);
+
+        Product::whereIn('id', $request->ids)->delete();
      }
 }

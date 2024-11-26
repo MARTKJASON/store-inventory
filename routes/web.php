@@ -19,6 +19,8 @@ Route::get('/', function () {
     return Inertia::render('test'); // This will get component Test.jsx from the resources/js/Pages/Test.jsx
 });
 Route::post('/products/create', [ProductController::class, 'store']);
+Route::put('/products/{id}', [ProductController::class, 'update']);
+Route::post('/products/bulk-destroy', [ProductController::class, 'bulkDestroy']);
 Route::get('/categories', function () {
     return Inertia::render('categories'); // This will get component Test.jsx from the resources/js/Pages/Test.jsx
 });
