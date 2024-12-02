@@ -21,7 +21,7 @@ interface EditProductDrawerProps {
         categoryId: number | undefined;
         pricing: number | "";
     }) => void;
-    categories: number[]; // List of category options
+    categories: { id: number; name: string }[]; // List of category options
     selected: number[];
     products: any;
 }
@@ -41,6 +41,16 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
     const { categoriesData } = useFetchCategories();
     const [productId, setProductId] = useState<number | null>(null);
 
+
+    const handleGetNewCategory = (e: any) => {
+        const selectedCategoryName = e.target.value;
+        const selectedCategory = categoriesData.find(
+            (cat: any) => cat.category_name === selectedCategoryName,
+        );
+        setCategory(selectedCategoryName); // Update the selected category name
+        setCategoryId(selectedCategory?.id)
+    };
+
     useEffect(() => {
         if (selected.length === 1) {
             // Find the selected product
@@ -59,19 +69,12 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                 setProductName(selectedProduct.product_name || "");
                 setPricing(selectedProduct.pricing || "");
                 setCategory(selectedCategory?.category_name)
-                setCategoryId(selectedCategory?.id);
+                categoryId
             }
         }
-    }, [selected, ]);
+    }, [selected]);
 
-    const handleGetNewCategory = (e: any) => {
-        const selectedCategoryName = e.target.value;
-        const selectedCategory = categoriesData.find(
-            (cat: any) => cat.category_name === selectedCategoryName,
-        );
-        setCategory(selectedCategoryName); // Update the selected category name
-        setCategoryId(selectedCategory?.id)
-    };
+
 
     const handleSave = () => {
         onSave({
@@ -121,8 +124,8 @@ const EditProductDrawer: React.FC<EditProductDrawerProps> = ({
                         onChange={handleGetNewCategory}
                     >
                         {categories.map((category) => (
-                            <MenuItem key={category} value={category}>
-                                {category}
+                             <MenuItem key={category.id} value={category.name}>
+                                {category.name}
                             </MenuItem>
                         ))}
                     </Select>

@@ -7,6 +7,9 @@ import useFetchCategories from "../Hooks/useFetchCategories";
 import categoriesTableColumn from "../Components/Utils/categoriesTableColumn";
 import TableComponent from "../Components/Table";
 import { Button, TextField } from "@mui/material";
+import AddCategoryDrawer from "../Components/AddCategory";
+import EditCategoryDrawer from "../Components/EditCategory";
+import { Inertia } from "@inertiajs/inertia";
 
 interface Category {
     id: number;
@@ -19,6 +22,8 @@ const Dashboard = () => {
     const [selected, setSelected] = useState<number[]>([]);
     const [isAllSelected, setIsAllSelected] = useState(false);
     const { categoriesData, loading } = useFetchCategories();
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [isEditOpen, setIsEditOpen] = useState(false);
 
     const handleSelectAll = (
         event: React.ChangeEvent<HTMLInputElement>,
@@ -58,6 +63,50 @@ const Dashboard = () => {
         category.notes || "N/A",
     ];
 
+    console.log(selected);
+    const handleAddCategory = (category: {
+        categoryName: string;
+        description: string;
+        note: string | null | undefined;
+    }) => {
+        const payload = {
+            category_name: category.categoryName,
+            description: category.description,
+            notes:
+                category.note && category.note.trim() !== ""
+                    ? category.note
+                    : "None",
+        };
+
+        axios
+            .post("/category/create", payload)
+            .then(() => {
+                window.location.reload();
+                setSelected([]);
+            })
+            .catch((error) => {
+                if (error.response && error.response.status === 422) {
+                    alert("Category Name already Taken");
+                } else {
+                    console.error(
+                        "Error saving category:",
+                        error.response?.data || error.message,
+                    );
+                }
+            });
+    };
+
+    const deleteSelectedCategory = async (ids: number[]) => {
+        try {
+            await Inertia.post("/categories/bulk-delete", { ids: selected });
+
+            setSelected([]);
+            window.location.reload();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return (
         <>
             <Navbar />
@@ -75,14 +124,37 @@ const Dashboard = () => {
                         variant="contained"
                         color="primary"
                         sx={{ margin: 2 }}
+                        onClick={() => {
+                            setIsPopupOpen(true);
+                            setSelected([]);
+                            setIsAllSelected(false); // Reset selected items
+                        }}
                     >
                         Add New Category
                     </Button>
+
+                    <AddCategoryDrawer
+                        open={isPopupOpen}
+                        onClose={() => setIsPopupOpen(false)}
+                        onSave={handleAddCategory}
+                    />
+
+                    <EditCategoryDrawer
+                        open={isEditOpen}
+                        onClose={() => setIsEditOpen(false)}
+                        onSave={handleAddCategory}
+                        selected={selected}
+                        categories={categoriesData}
+                    />
 
                     <Button
                         variant="contained"
                         color="info"
                         disabled={selected.length === 0 || selected.length > 1}
+                        onClick={() => {
+                            setIsEditOpen(true);
+                            setIsAllSelected(false);
+                        }}
                     >
                         Edit Category
                     </Button>
@@ -91,6 +163,9 @@ const Dashboard = () => {
                         variant="contained"
                         color="error"
                         disabled={selected.length === 0}
+                        onClick={() => {
+                            deleteSelectedCategory(selected);
+                        }}
                     >
                         Delete Category({selected.length})
                     </Button>

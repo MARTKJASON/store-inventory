@@ -20,7 +20,7 @@ interface AddProductDrawerProps {
         categoryId: number | undefined;
         pricing: number;
     }) => void;
-    categories: string[]; // List of category options
+    categories: { id: number; name: string }[]; // List of category options
 }
 
 const AddProductDrawer: React.FC<AddProductDrawerProps> = ({
@@ -40,6 +40,7 @@ const AddProductDrawer: React.FC<AddProductDrawerProps> = ({
             (cat: any) => cat.category_name === category,
         );
         setCategoryId(selectedCategory?.id);
+        console.log(categories)
     }, [categoryId, category]);
 
     const handleSave = () => {
@@ -92,8 +93,8 @@ const AddProductDrawer: React.FC<AddProductDrawerProps> = ({
                         onChange={(e) => setCategory(e.target.value)}
                     >
                         {categories.map((category) => (
-                            <MenuItem key={category} value={category}>
-                                {category}
+                             <MenuItem key={category.id} value={category.name}>
+                                {category.name}
                             </MenuItem>
                         ))}
                     </Select>

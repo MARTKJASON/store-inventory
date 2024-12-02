@@ -29,9 +29,9 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'category_name' => 'required|string|max:255',
-            'notes' => 'string|max:255',
-            'description' => 'string|max:255',
+            'category_name' => 'required|string|max:255|unique:categories,category_name',
+            'description' => 'nullable|string|max:255',
+            'notes' => 'nullable|string|max:255',
         ]);
 
         $product = Category::create($validated); // Create and store the new product
@@ -59,14 +59,38 @@ class CategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $category = Category::findOrFail($id);
+
+        $validated = $request->validate([
+            'category_name' => 'string|max:255|unique:categories,category_name',
+            'description' => 'string|max:255',
+            'notes' => 'nullable|string|max:255',
+        ]);
+
+        $category->update($validated);
+        return response()->json($category);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function bulkDestroy(Request $request)
     {
-        //
+       $request->validate([
+           'ids' => 'required|array',
+           'ids.*' => 'integer|exists:categories,id'
+       ]);
+
+       Category::whereIn('id', $request->ids)->delete();
+
+       $categories = Category::with('products')->whereIn('id', $request->ids)->get();
+
+       // Delete associated products
+       foreach ($categories as $category) {
+           $category->products()->delete();
+       }
+
+       // Delete categories
+       Category::whereIn('id', $request->ids)->delete();
     }
 }

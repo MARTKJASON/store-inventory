@@ -73,8 +73,6 @@ const Test = () => {
             pricing: product.pricing,
         };
 
-        console.log(payload);
-
         axios
             .put(`/products/${product.id}`, payload)
             .then(() => {

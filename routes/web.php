@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -21,6 +22,9 @@ Route::get('/', function () {
 Route::post('/products/create', [ProductController::class, 'store']);
 Route::put('/products/{id}', [ProductController::class, 'update']);
 Route::post('/products/bulk-destroy', [ProductController::class, 'bulkDestroy']);
+Route::post('/category/create', [CategoryController::class, 'store']);
+Route::put('/category/{id}', [CategoryController::class, 'update']);
+Route::post('/categories/bulk-delete', [CategoryController::class, 'bulkDestroy']);
 Route::get('/categories', function () {
-    return Inertia::render('categories'); // This will get component Test.jsx from the resources/js/Pages/Test.jsx
+    return Inertia::render('categories');
 });
