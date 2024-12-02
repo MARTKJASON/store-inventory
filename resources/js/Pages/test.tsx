@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../Components/Navbar.js";
-import StickyHeadTable from "../Components/ProductTable.js";
+import TableComponent from "../Components/Table.js";
 import axios from "axios";
 import { Button, TextField } from "@mui/material";
 import useFetchProducts from "../Hooks/useFetchProducts.js";
@@ -9,6 +9,7 @@ import EditProductDrawer from "../Components/EditProduct.js";
 import useFetchCategories from "../Hooks/useFetchCategories.js";
 import { router } from "@inertiajs/react";
 import { Inertia } from "@inertiajs/inertia";
+import productsTableColumn from "../Components/Utils/productsTableColumn.js";
 
 const Test = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
@@ -49,6 +50,15 @@ const Test = () => {
                 );
             });
     };
+
+    const productColumns = (product: any) => [
+        product.id,
+        product.product_name,
+        getCategoryName(product.category_id),
+        product.stocks || "N/A",
+        `₱ ${product.pricing || "N/A"}`,
+      ];
+
 
     const handleEdit = (product: {
         id: number | null;
@@ -234,15 +244,18 @@ const Test = () => {
                     />
                 </div>
 
-                <StickyHeadTable
+                <TableComponent
                     selected={selected}
                     setSelected={setSelected}
                     isAllSelected={isAllSelected}
                     handleSelectAll={handleSelectAll}
                     handleSelect={handleSelect}
                     filteredProducts={filteredProducts}
-                    getCategoryName={getCategoryName}
                     isLoading={loading}
+                    tableColumns={productsTableColumn}
+                    columns={productColumns}
+                    rowKey={(product) => product.id}
+                    sortFn={(a, b) => b.id - a.id}
                 />
             </div>
         </div>

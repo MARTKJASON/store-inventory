@@ -10,7 +10,7 @@ import TableRow from "@mui/material/TableRow";
 import Checkbox from "@mui/material/Checkbox";
 import Skeleton from "@mui/material/Skeleton";
 
-interface ProductListProps {
+interface TableComponentProps {
     selected: number[];
     setSelected: React.Dispatch<React.SetStateAction<number[]>>;
     isAllSelected: boolean;
@@ -18,22 +18,27 @@ interface ProductListProps {
     handleSelectAll: (
         event: React.ChangeEvent<HTMLInputElement>,
         products: any[],
-        rowsPerPage: number
+        rowsPerPage: number,
     ) => void;
     handleSelect: (id: number, products: any[], rowsPerPage: number) => void;
-    getCategoryName: (product: number) => string;
     isLoading: boolean;
+    tableColumns: string[];
+    columns: (item: any) => React.ReactNode[];
+    rowKey: (item: any) => string | number;
+    sortFn?: (a: any, b: any) => number;
 }
 
-const ProductList: React.FC<ProductListProps> = ({
+const TableComponent: React.FC<TableComponentProps> = ({
     selected,
-    setSelected,
     isAllSelected,
     handleSelectAll,
     handleSelect,
     filteredProducts,
-    getCategoryName,
     isLoading,
+    tableColumns,
+    columns,
+    rowKey,
+    sortFn,
 }) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -42,10 +47,16 @@ const ProductList: React.FC<ProductListProps> = ({
         setPage(newPage);
     };
 
-    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChangeRowsPerPage = (
+        event: React.ChangeEvent<HTMLInputElement>,
+    ) => {
         setRowsPerPage(+event.target.value);
         setPage(0);
     };
+
+    const paginatedData = filteredProducts
+        .sort(sortFn)
+        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
     return (
         <Paper sx={{ width: "100%", overflow: "hidden" }}>
@@ -95,7 +106,7 @@ const ProductList: React.FC<ProductListProps> = ({
                                                     filteredProducts.slice(
                                                         page * rowsPerPage,
                                                         page * rowsPerPage +
-                                                            rowsPerPage
+                                                            rowsPerPage,
                                                     ).length
                                             }
                                             checked={isAllSelected}
@@ -103,56 +114,56 @@ const ProductList: React.FC<ProductListProps> = ({
                                                 handleSelectAll(
                                                     event,
                                                     filteredProducts,
-                                                    rowsPerPage
+                                                    rowsPerPage,
                                                 )
                                             }
                                         />
                                     </TableCell>
-                                    <TableCell sx={{ color: "#1e40af", fontWeight: "bold" }}>
-                                        Product ID
-                                    </TableCell>
-                                    <TableCell sx={{ color: "#1e40af", fontWeight: "bold" }}>
-                                        Product Name
-                                    </TableCell>
-                                    <TableCell sx={{ color: "#1e40af", fontWeight: "bold" }}>
-                                        Category
-                                    </TableCell>
-                                    <TableCell sx={{ color: "#1e40af", fontWeight: "bold" }}>
-                                        Stocks
-                                    </TableCell>
-                                    <TableCell sx={{ color: "#1e40af", fontWeight: "bold" }}>
-                                        Price
-                                    </TableCell>
+                                    {tableColumns.map((column) => (
+                                        <TableCell
+                                            key={column}
+                                            sx={{
+                                                color: "#1e40af",
+                                                fontWeight: "bold",
+                                            }}
+                                        >
+                                            {column}
+                                        </TableCell>
+                                    ))}
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {filteredProducts
-                                    .sort((a: any, b: any) => b.id - a.id)
-                                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                    .map((product: any) => (
-                                        <TableRow hover role="checkbox" tabIndex={-1} key={product.id}>
-                                            <TableCell padding="checkbox">
-                                                <Checkbox
-                                                    color="primary"
-                                                    checked={selected.includes(product.id)}
-                                                    onChange={() =>
-                                                        handleSelect(
-                                                            product.id,
-                                                            filteredProducts,
-                                                            rowsPerPage
-                                                        )
-                                                    }
-                                                />
-                                            </TableCell>
-                                            <TableCell>{product.id}</TableCell>
-                                            <TableCell>{product.product_name}</TableCell>
-                                            <TableCell>
-                                                {getCategoryName(product.category_id)}
-                                            </TableCell>
-                                            <TableCell>{product.stocks || "N/A"}</TableCell>
-                                            <TableCell>₱ {product.pricing || "N/A"}</TableCell>
-                                        </TableRow>
-                                    ))}
+                                {paginatedData.map((item:any) => (
+                                    <TableRow
+                                        hover
+                                        role="checkbox"
+                                        tabIndex={-1}
+                                        key={rowKey(item)}
+                                    >
+                                        <TableCell padding="checkbox">
+                                            <Checkbox
+                                                color="primary"
+                                                checked={selected.includes(
+                                                    rowKey(item) as number,
+                                                )}
+                                                onChange={() =>
+                                                    handleSelect(
+                                                        rowKey(item) as number,
+                                                        filteredProducts,
+                                                        rowsPerPage,
+                                                    )
+                                                }
+                                            />
+                                        </TableCell>
+                                        {columns(item).map(
+                                            (cellContent, index) => (
+                                                <TableCell key={index}>
+                                                    {cellContent}
+                                                </TableCell>
+                                            ),
+                                        )}
+                                    </TableRow>
+                                ))}
                             </TableBody>
                         </Table>
                     </TableContainer>
@@ -172,4 +183,4 @@ const ProductList: React.FC<ProductListProps> = ({
     );
 };
 
-export default ProductList;
+export default TableComponent;
