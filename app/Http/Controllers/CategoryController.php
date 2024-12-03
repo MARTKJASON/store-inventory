@@ -41,9 +41,12 @@ class CategoryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(int $id)
     {
-        return Category::findOrFail($id);
+        $category = Category::with('products')->findOrFail($id); // Fetch the category and its related products
+        return response()->json([
+            'category' => $category
+        ]);
     }
 
     /**
@@ -62,7 +65,7 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
 
         $validated = $request->validate([
-            'category_name' => 'string|max:255|unique:categories,category_name',
+            'category_name' => 'string|max:255',
             'description' => 'string|max:255',
             'notes' => 'nullable|string|max:255',
         ]);

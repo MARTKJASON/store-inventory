@@ -12,6 +12,7 @@ interface EditCategoryProps {
     open: boolean;
     onClose: () => void;
     onSave: (category: {
+        id:number | null
         categoryName: string;
         description: string
         note: string | '';
@@ -30,12 +31,14 @@ const EditCategoryDrawer: React.FC<EditCategoryProps> = ({
     const [categoryName, setCategoryName] = useState("");
     const [description, setDescription] = useState<string | "">("");
     const [note, setNote] = useState<string| "">("")
+    const [categoryId , setCategoryId] = useState<number | null>(null)
 
 
     useEffect(() => {
         if(selected.length === 1){
             const selectedCategory = categories.find((c: any) => c.id === selected[0])
 
+            setCategoryId(selectedCategory.id)
             setCategoryName(selectedCategory.category_name)
             setDescription(selectedCategory.description)
             setNote(selectedCategory.notes)
@@ -45,10 +48,8 @@ const EditCategoryDrawer: React.FC<EditCategoryProps> = ({
     },[selected])
 
     const handleSave = () => {
-        if (categoryName && description) {
-            onSave({ categoryName, description, note});
+            onSave({ id:categoryId ,categoryName, description, note});
             onClose();
-        }
     };
 
 
@@ -81,6 +82,7 @@ const EditCategoryDrawer: React.FC<EditCategoryProps> = ({
                     label="Category Name"
                     value={categoryName}
                     onChange={(e) => setCategoryName(e.target.value)}
+                    disabled={open}
                 />
                                 <TextField
                     fullWidth

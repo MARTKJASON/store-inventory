@@ -10,6 +10,8 @@ import { Button, TextField } from "@mui/material";
 import AddCategoryDrawer from "../Components/AddCategory";
 import EditCategoryDrawer from "../Components/EditCategory";
 import { Inertia } from "@inertiajs/inertia";
+import CategoryDetails from "../Components/categoryDetails";
+
 
 interface Category {
     id: number;
@@ -21,9 +23,12 @@ interface Category {
 const Dashboard = () => {
     const [selected, setSelected] = useState<number[]>([]);
     const [isAllSelected, setIsAllSelected] = useState(false);
-    const { categoriesData, loading } = useFetchCategories();
+    const { categoriesData, loading, fetchCategoryDetails } =
+        useFetchCategories();
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
+    const [categoryDetail, setCategoryDetail] = useState<any>(null);
+    const [isDetail, setIsDetail] = useState<boolean>(false);
 
     const handleSelectAll = (
         event: React.ChangeEvent<HTMLInputElement>,
@@ -63,7 +68,7 @@ const Dashboard = () => {
         category.notes || "N/A",
     ];
 
-    console.log(selected);
+    console.log(selected[0]);
     const handleAddCategory = (category: {
         categoryName: string;
         description: string;
@@ -96,6 +101,36 @@ const Dashboard = () => {
             });
     };
 
+    const handleEditCategory = (category: {
+        id: number | null;
+        categoryName: string;
+        description: string;
+        note: string;
+    }) => {
+        const payload = {
+            id: category.id,
+            category_name: category.categoryName,
+            description: category.description,
+            notes:
+                category.note && category.note.trim() !== ""
+                    ? category.note
+                    : "None",
+        };
+
+        axios
+            .put(`/category/${category.id}`, payload)
+            .then(() => {
+                window.location.reload();
+                setSelected([]);
+            })
+            .catch((error) => {
+                console.error(
+                    "Error Saving Edited Category:",
+                    error.response?.data || error.message,
+                );
+            });
+    };
+
     const deleteSelectedCategory = async (ids: number[]) => {
         try {
             await Inertia.post("/categories/bulk-delete", { ids: selected });
@@ -106,6 +141,19 @@ const Dashboard = () => {
             console.error(error);
         }
     };
+
+    const selectedCategoryDetail = async (id: number[]) => {
+        try {
+            const response = await axios.get(`/category/${id}/details`);
+            console.log(response.data); // Handle the JSON data here
+            setCategoryDetail(response.data);
+            return categoryDetail // You can use this data in your component
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    console.log(categoryDetail)
 
     return (
         <>
@@ -142,7 +190,7 @@ const Dashboard = () => {
                     <EditCategoryDrawer
                         open={isEditOpen}
                         onClose={() => setIsEditOpen(false)}
-                        onSave={handleAddCategory}
+                        onSave={handleEditCategory}
                         selected={selected}
                         categories={categoriesData}
                     />
@@ -157,6 +205,21 @@ const Dashboard = () => {
                         }}
                     >
                         Edit Category
+                    </Button>
+                    <CategoryDetails
+                        open={isDetail}
+                        onClose={() => setIsDetail(false)}
+                        selected={selected}
+                    />
+                    <Button
+                        variant="contained"
+                        color="info"
+                        disabled={selected.length === 0 || selected.length > 1}
+                        onClick={() => {
+                            setIsDetail(true);
+                        }}
+                    >
+                        Details
                     </Button>
 
                     <Button

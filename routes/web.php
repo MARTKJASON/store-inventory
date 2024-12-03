@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -28,3 +29,4 @@ Route::post('/categories/bulk-delete', [CategoryController::class, 'bulkDestroy'
 Route::get('/categories', function () {
     return Inertia::render('categories');
 });
+Route::get('/category/{id}/details',[CategoryController::class, 'show']);
