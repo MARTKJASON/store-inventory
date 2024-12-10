@@ -252,7 +252,7 @@ const Dashboard = () => {
                     isLoading={loading}
                     tableColumns={categoriesTableColumn}
                     columns={categoryColumns}
-                    rowKey={(category) => category.id}
+                    rowKey={(category:any) => category.id}
                     sortFn={(a: any, b: any) => b.id - a.id}
                 />
             </div>

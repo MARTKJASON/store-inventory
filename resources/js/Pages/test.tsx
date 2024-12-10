@@ -14,9 +14,6 @@ import productsTableColumn from "../Components/Utils/productsTableColumn.js";
 const Test = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isEditPopupOpen, setEditIsPopupOpen] = useState(false);
-    const [productName, setProductName] = useState<string | undefined>("");
-    const [EditCategoryId, setEditCategoryId] = useState<number | undefined>();
-    const [pricing, setPricing] = useState<number>();
     const [selected, setSelected] = useState<number[]>([]);
     const [isAllSelected, setIsAllSelected] = useState(false);
     const [searchQuery, setSearchQuery] = useState(""); // Search query state
@@ -35,6 +32,7 @@ const Test = () => {
             category_id: product.categoryId, // Assuming `category` has an `id` field
             pricing: product.pricing,
         };
+
 
         // Send the payload to the backend using router.post
         axios
@@ -94,9 +92,6 @@ const Test = () => {
             const findCat = categoriesData.find(
                 (cat: any) => cat.id === testing?.category_id,
             );
-            setProductName(testing?.product_name);
-            setEditCategoryId(findCat?.id);
-            setPricing(testing?.pricing);
         }
     }, [selected]);
 

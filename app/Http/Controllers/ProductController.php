@@ -4,13 +4,23 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use Inertia\Inertia;
 
 class ProductController extends Controller
 {
      // Method to get all products
      public function index()
      {
-         return Product::all();  // Returns all products from the database
+
+        if (request()->wantsJson()) {
+            return Product::all();
+        }
+
+        // Default Inertia response
+        return Inertia::render('test', [
+            'products' => Product::all(),
+        ]);
+
      }
 
      // Method to get a specific product by ID

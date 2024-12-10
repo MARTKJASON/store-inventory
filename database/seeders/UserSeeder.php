@@ -21,9 +21,8 @@ class UserSeeder extends Seeder
                 'first_name' => $faker->firstName,
                 'last_name' => $faker->lastName,
                 'is_admin' => $faker->boolean(50),  // 50% chance for true or false
-                'is_warehousestaff' => $faker->boolean(50),
-                'is_salesperson' => $faker->boolean(50),
                 'password' => Hash::make('password123'),
+                'email' => $faker->unique()->email,
                 'store_id' => $faker->unique()->uuid,  // Generate a unique UUID
                 'remember_token' => $faker->optional()->uuid,  // Optionally generate a remember token
             ]);

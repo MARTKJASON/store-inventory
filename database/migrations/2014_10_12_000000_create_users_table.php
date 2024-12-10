@@ -16,10 +16,8 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->boolean('is_admin');
-            $table->boolean('is_warehousestaff');
-            $table->boolean('is_salesperson');
             $table->string('password');
-            $table->string('store_id')->uniqid();
+            $table->string('store_id');
             $table->rememberToken();
             $table->timestamps();
         });
