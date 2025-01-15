@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -47,6 +48,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/categories', function () {
         return Inertia::render('categories');
     });
+
+    Route::get('/suppliers', [SupplierController::class, 'index'])->name('supplier.index');
+
 });
 
 
