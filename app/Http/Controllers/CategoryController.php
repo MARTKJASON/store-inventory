@@ -84,16 +84,9 @@ class CategoryController extends Controller
            'ids.*' => 'integer|exists:categories,id'
        ]);
 
-       Category::whereIn('id', $request->ids)->delete();
-
-       $categories = Category::with('products')->whereIn('id', $request->ids)->get();
-
-       // Delete associated products
-       foreach ($categories as $category) {
-           $category->products()->delete();
-       }
+       Category::bulkDestroy($request->ids);
 
        // Delete categories
-       Category::whereIn('id', $request->ids)->delete();
+       return response()->json(['message' => 'Categories and their associated products have been deleted.']);
     }
 }

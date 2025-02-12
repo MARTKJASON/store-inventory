@@ -7,16 +7,17 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class WelcomeNotification extends Notification
+class DepositSuccessful extends Notification
 {
     use Queueable;
-    protected $message;
+    protected $amount;
+
     /**
      * Create a new notification instance.
      */
-    public function __construct($message)
+    public function __construct(float $amount)
     {
-        $this->message = $message;
+         $this->amount = $amount;
     }
 
     /**
@@ -26,20 +27,21 @@ class WelcomeNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['mail'];
     }
 
     /**
      * Get the mail representation of the notification.
      */
-
-
-    public function toDatabase($notifiable)
+    public function toMail(object $notifiable): MailMessage
     {
-        return [
-            'message' => $this->message,
-            'url' => '/notifications'
-        ];
+        return (new MailMessage)
+            ->subject('Deposit Successful')
+            ->greeting('Hello, ' . $notifiable->name . '!')
+            ->line('We are pleased to inform you that your deposit of $' . number_format($this->amount, 2) . ' was successful.')
+            ->line('Thank you for using our service!')
+            ->action('View Dashboard', url('/dashboard'))
+            ->line('If you have any questions, feel free to contact us.');
     }
 
     /**

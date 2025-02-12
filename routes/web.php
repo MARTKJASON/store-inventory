@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DepositController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\StockController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -26,7 +29,7 @@ Route::post('/loginUser', [UserController::class, 'userLogin'])->withoutMiddlewa
 Route::get('/register', [UserController::class, 'create'])->name('register.form');
 Route::post('/register', [UserController::class, 'store']);
 
-Route::get('/test-auth', function () {
+Route::get('/auth', function () {
     return Auth::check() ? Auth::user() : 'Not Authenticated';
 });
 
@@ -34,8 +37,8 @@ Route::post('/logout', [UserController::class, 'logout']);
 
 Route::middleware(['auth'])->group(function () {
     // Product-related routes
-    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
-    Route::get('/', [ProductController::class, 'index'])->name('products.index');
+    Route::get('/products', [StockController::class, 'index'])->name('products.index');
+    Route::get('/', [StockController::class, 'index'])->name('products.index');
     Route::post('/products/create', [ProductController::class, 'store']);
     Route::put('/products/{id}', [ProductController::class, 'update']);
     Route::post('/products/bulk-destroy', [ProductController::class, 'bulkDestroy']);
@@ -50,7 +53,13 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::get('/suppliers', [SupplierController::class, 'index'])->name('supplier.index');
+    Route::post('/send-welcome-notification', [NotificationController::class, 'sendWelcomeNotification']);
+    Route::get('/notifications', [NotificationController::class, 'notifications']);
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
 
+    Route::post('/deposit', [DepositController::class, 'deposit'])->name('deposit');
+
+    // Route::get('/stocks', [StockController::class, 'index'])->name('stocks.index');
 });
 
 

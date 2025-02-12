@@ -24,6 +24,7 @@ class User extends Authenticatable
         'password',
         'store_id',   // Add store_id here
         'is_admin',   // Add is_admin here
+        'balance'
     ];
 
     /**
@@ -45,4 +46,16 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+
+    public function updateUser(array $data)
+    {
+        if(!empty($data['password'])){
+            $data['password'] = bcrypt($data['password']);
+        }
+
+        return $this->update($data);
+    }
 }
+
+

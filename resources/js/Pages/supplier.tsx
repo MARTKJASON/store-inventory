@@ -1,11 +1,11 @@
 import Navbar from "../Components/Navbar";
 import Suppliers from "../Components/Suppliers";
+import { usePage } from "@inertiajs/react";
 
 const SupplierPage = () => {
     return (
         <>
             <Navbar />
-            <h1>Supplier Lists</h1>
             <div className="flex items-center  min-h-screen bg-gray-100 p-6">
                 <Suppliers
                     name="ABC Supplies Co."

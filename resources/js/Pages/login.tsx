@@ -106,8 +106,8 @@ const LoginForm: React.FC = () => {
             try {
                 // Ensure CSRF token is included in the header
                 const response = await axios.post("/loginUser", formData);
-                console.log("test", response.status);
                 if (response.status === 200) {
+                  await  axios.post('/send-welcome-notification');
                     Inertia.visit("/products");
                 }
             } catch (error: any) {

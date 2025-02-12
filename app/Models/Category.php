@@ -21,4 +21,24 @@ class Category extends Model
     {
         return $this->hasMany(Product::class);
     }
+
+    public static function bulkDestroy(array $ids)
+    {
+        $validIds = self::whereIn('id', $ids)->pluck('id')->toArray();
+
+        if(empty($validIds))
+        {
+            return;
+        }
+
+        $categories = self::with('products')->whereIn('id', $validIds)->get();
+
+        foreach($categories as $category)
+        {
+            $category->products()->delete();
+        }
+
+        self::whereIn('id', $validIds)->delete();
+
+    }
 }

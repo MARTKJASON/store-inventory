@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Notifications\WelcomeNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -15,8 +16,12 @@ class UserController extends Controller
     public function index(Request $request)
     {
         // Paginate users and return as JSON response
-        $users = User::paginate(10); // 10 users per page
-        return response()->json($users);
+        $user = Auth::user();
+
+        return Inertia::render('test', [
+            'user' => $user
+        ]);
+
     }
 
     /**
@@ -82,10 +87,8 @@ class UserController extends Controller
     // Create the new user
     $user = User::create($validated);
 
-    // Optionally, log the user in immediately
     Auth::login($user);
 
-    // Redirect to a dashboard or products page after registration
     return redirect()->route('products.index')->with('success', 'User registered and logged in.');
     }
 
@@ -141,13 +144,8 @@ class UserController extends Controller
             'password' => 'nullable|string|min:8|max:255', // Password is optional for update
         ]);
 
-        // If password is provided, hash it
-        if ($request->has('password') && !empty($request->password)) {
-            $validatedData['password'] = bcrypt($validatedData['password']);
-        }
-
         // Update the user with validated data
-        $user->update($validatedData);
+        $user->updateUser($validatedData);
 
         // Redirect back to users index with success message
        return redirect()->route('users.index')->with('success', 'User updated successfully.');

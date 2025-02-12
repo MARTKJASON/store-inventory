@@ -11,7 +11,20 @@ import { router } from "@inertiajs/react";
 import { Inertia } from "@inertiajs/inertia";
 import productsTableColumn from "../Components/Utils/productsTableColumn.js";
 
-const Test = () => {
+type Stock = {
+    product_id: number;
+    supplier_id: number;
+    quantity: number;
+};
+
+interface Props {
+    stocks: Stock[];
+    notifications: any
+}
+
+
+
+const Test: React.FC<Props>  = ({stocks, notifications}) => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isEditPopupOpen, setEditIsPopupOpen] = useState(false);
     const [selected, setSelected] = useState<number[]>([]);
@@ -20,6 +33,9 @@ const Test = () => {
     const { products, filteredProducts, setFilteredProducts, loading } =
         useFetchProducts();
     const { categoriesData, categoryNames } = useFetchCategories();
+
+
+
 
     const handleAddProduct = (product: {
         productName: string;
@@ -49,14 +65,25 @@ const Test = () => {
             });
     };
 
-    const productColumns = (product: any) => [
-        product.id,
-        product.product_name,
-        getCategoryName(product.category_id),
-        product.stocks || "N/A",
-        `₱ ${product.pricing || "N/A"}`,
-      ];
 
+    const productColumns = (product: any) => {
+        const productStock = stocks
+          .filter((stock) => stock.product_id === product.id) // Filter stocks for the current product
+          .reduce((total, stock) => total + stock.quantity, 0); // Sum up the quantities
+
+        // Determine stock color based on the quantity
+        const stockColor = productStock >= 70 ? 'text-green-500' :
+                           productStock > 45 ? 'text-orange-500' :
+                           'text-red-500';
+
+        return [
+          product.id,
+          product.product_name,
+          getCategoryName(product.category_id),
+          <span className={`font-bold ${stockColor}`}>{productStock || "N/A"}</span>, // Apply the color to the stock quantity
+          `₱ ${product.pricing || "N/A"}`,
+        ];
+    };
 
     const handleEdit = (product: {
         id: number | null;
@@ -186,6 +213,8 @@ const Test = () => {
                     >
                         Add New Product
                     </Button>
+
+                    {/* <button onClick={sendNotification}>Send Welcome Notification</button> */}
 
                     {/* Popup Trigger */}
                     <AddProductDrawer

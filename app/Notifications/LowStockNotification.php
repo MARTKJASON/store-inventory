@@ -7,16 +7,18 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class WelcomeNotification extends Notification
+class LowStockNotification extends Notification
 {
     use Queueable;
-    protected $message;
+
     /**
      * Create a new notification instance.
      */
-    public function __construct($message)
+    protected $lowStockItems;
+
+    public function __construct($lowStockItems)
     {
-        $this->message = $message;
+        $this->lowStockItems = $lowStockItems;
     }
 
     /**
@@ -32,13 +34,11 @@ class WelcomeNotification extends Notification
     /**
      * Get the mail representation of the notification.
      */
-
-
-    public function toDatabase($notifiable)
+    public function toDatabase(object $notifiable)
     {
         return [
-            'message' => $this->message,
-            'url' => '/notifications'
+            'message' => 'Some products are low in stock!',
+            'details' => $this->lowStockItems,
         ];
     }
 
