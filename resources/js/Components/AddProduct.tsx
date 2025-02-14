@@ -18,6 +18,7 @@ interface AddProductDrawerProps {
     onSave: (product: {
         productName: string;
         categoryId: number | undefined;
+        stocks: number ;
         pricing: number;
     }) => void;
     categories: { id: number; name: string }[]; // List of category options
@@ -32,6 +33,7 @@ const AddProductDrawer: React.FC<AddProductDrawerProps> = ({
     const [productName, setProductName] = useState("");
     const [category, setCategory] = useState("");
     const [pricing, setPricing] = useState<number | "">("");
+    const [stocks, setStocks] = useState<number | "">("");
     const { categoriesData } = useFetchCategories();
     const [categoryId, setCategoryId] = useState<number | undefined>();
 
@@ -44,13 +46,14 @@ const AddProductDrawer: React.FC<AddProductDrawerProps> = ({
     }, [categoryId, category]);
 
     const handleSave = () => {
-        console.log("test", categoryId);
-        if (productName && categoryId && pricing) {
-            onSave({ productName, categoryId, pricing: Number(pricing) });
+
+        if (productName && categoryId && pricing && stocks) {
+            onSave({ productName, categoryId, pricing: Number(pricing) , stocks: Number(stocks)});
             onClose();
             setProductName("");
             setCategory("");
             setPricing("");
+            setStocks("");
         } else {
             alert("Please fill in all fields.");
         }
@@ -107,6 +110,18 @@ const AddProductDrawer: React.FC<AddProductDrawerProps> = ({
                     value={pricing}
                     onChange={(e) =>
                         setPricing(
+                            e.target.value === "" ? "" : Number(e.target.value),
+                        )
+                    }
+                />
+                <TextField
+                    fullWidth
+                    margin="normal"
+                    label="Stocks"
+                    type="number"
+                    value={stocks}
+                    onChange={(e) =>
+                        setStocks(
                             e.target.value === "" ? "" : Number(e.target.value),
                         )
                     }

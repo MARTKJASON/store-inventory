@@ -37,8 +37,8 @@ Route::post('/logout', [UserController::class, 'logout']);
 
 Route::middleware(['auth'])->group(function () {
     // Product-related routes
-    Route::get('/products', [StockController::class, 'index'])->name('products.index');
-    Route::get('/', [StockController::class, 'index'])->name('products.index');
+    Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    Route::get('/', [ProductController::class, 'index'])->name('products.index');
     Route::post('/products/create', [ProductController::class, 'store']);
     Route::put('/products/{id}', [ProductController::class, 'update']);
     Route::post('/products/bulk-destroy', [ProductController::class, 'bulkDestroy']);
@@ -61,6 +61,9 @@ Route::middleware(['auth'])->group(function () {
 
     // Route::get('/stocks', [StockController::class, 'index'])->name('stocks.index');
     Route::get('/products/export-csv', [ProductController::class, 'exportCsv'])->name('products.export');
+
+    Route::get('/products/template', [ProductController::class, 'downloadTemplate'])->name('products.template');
+
 });
 
 

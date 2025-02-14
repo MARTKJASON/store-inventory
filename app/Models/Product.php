@@ -15,8 +15,9 @@ class Product extends Model
     // The attributes that are mass assignable
     protected $fillable = [
         'product_name', // Product name
-        'category_id',  // Foreign key for category
-        'pricing',      // Product price
+        'category_id',
+        'pricing',
+        'stocks'
     ];
 
     /**

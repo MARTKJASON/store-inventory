@@ -133,7 +133,7 @@ const TableComponent: React.FC<TableComponentProps> = ({
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {paginatedData.map((item:any) => (
+                                {paginatedData.map((item: any) => (
                                     <TableRow
                                         hover
                                         role="checkbox"
@@ -155,36 +155,55 @@ const TableComponent: React.FC<TableComponentProps> = ({
                                                 }
                                             />
                                         </TableCell>
-                                        {columns(item).map((cellContent, index) => {
-                                                   // Apply conditional color to the stock value column (assuming it's at index 3)
-                                            if (index === 3) {
-                                                let stockValue = cellContent;
+                                        {columns(item).map(
+                                            (cellContent, index) => {
+                                                // Apply conditional color to the stock value column (assuming it's at index 3)
+                                                if (index === 6) {
+                                                    let stockValue =
+                                                        cellContent;
 
-                                                // Ensure stockValue is a number, fallback to 0 if it's null, undefined, or not a number
-                                                if (stockValue === null || stockValue === undefined || isNaN(Number(stockValue))) {
-                                                    stockValue = 0;
-                                                } else {
-                                                    stockValue = Number(stockValue); // Ensure it's treated as a number
+                                                    // Ensure stockValue is a number, fallback to 0 if it's null, undefined, or not a number
+                                                    if (
+                                                        stockValue === null ||
+                                                        stockValue ===
+                                                            undefined ||
+                                                        isNaN(
+                                                            Number(stockValue),
+                                                        )
+                                                    ) {
+                                                        stockValue = 0;
+                                                    } else {
+                                                        stockValue =
+                                                            Number(stockValue); // Ensure it's treated as a number
+                                                    }
+
+                                                    // Determine the color class based on the stock value
+                                                    const stockIndicator =
+                                                        stockValue >= 70
+                                                            ? <p>High</p>
+                                                            : stockValue > 45
+                                                              ? <p>Normal</p>
+                                                              : <p>Low</p>;
+
+                                                    return (
+                                                        <TableCell
+                                                            key={index}
+                                                            className={`font-bold ${stockIndicator}`}
+                                                        >
+                                                            {stockIndicator ||
+                                                                "N/A"}{" "}
+
+                                                        </TableCell>
+                                                    );
                                                 }
 
-                                                // Determine the color class based on the stock value
-                                                const stockColor = stockValue >= 70 ? 'text-green-500' :
-                                                                stockValue > 45 ? 'text-orange-500' :
-                                                                'text-red-500';
-
                                                 return (
-                                                    <TableCell key={index} className={`font-bold ${stockColor}`}>
-                                                        {stockValue || "N/A"}  {/* Handle null/undefined */}
+                                                    <TableCell key={index}>
+                                                        {cellContent}
                                                     </TableCell>
                                                 );
-                                            }
-
-                                            return (
-                                                <TableCell key={index}>
-                                                    {cellContent}
-                                                </TableCell>
-                                            );
-                                            })}
+                                            },
+                                        )}
                                     </TableRow>
                                 ))}
                             </TableBody>

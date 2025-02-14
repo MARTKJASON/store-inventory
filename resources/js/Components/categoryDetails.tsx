@@ -9,6 +9,7 @@ import {
     Grid,
     Box,
     Paper,
+    Divider,
 } from "@mui/material";
 import axios from "axios";
 
@@ -68,14 +69,19 @@ const CategoryDetails: React.FC<CategoryDetailProps> = ({
                 {categoryDetail ? (
                     <>
                         <Box
-                            sx={{ mb: 3, boxShadow: 2, borderRadius: 2, p: 3 ,     marginTop: "20px"}}
+                            sx={{
+                                mb: 3,
+                                boxShadow: 2,
+                                borderRadius: 2,
+                                p: 3,
+                                marginTop: "20px",
+                            }}
                         >
                             <Typography
                                 variant="h5"
                                 sx={{
                                     fontWeight: "bold",
                                     color: "primary.main",
-
                                 }}
                             >
                                 {categoryDetail.category_name}
@@ -111,23 +117,39 @@ const CategoryDetails: React.FC<CategoryDetailProps> = ({
                                 </Typography>
                             ) : (
                                 <>
-                                    {categoryDetail.products.map((product) => (
-                                        <Box key={product.id} sx={{ mb: 2 }}>
-                                            <Typography
-                                                variant="body1"
-                                                sx={{ fontWeight: "bold" }}
+                                    {categoryDetail.products.map(
+                                        ({ id, product_name, pricing }) => (
+                                            <Box
+                                                key={id}
+                                                sx={{
+                                                    mb: 2,
+                                                    bgcolor: "white",
+                                                    p: 2,
+                                                    borderRadius: 1,
+                                                    boxShadow: 1,
+                                                }}
                                             >
-                                                {product.product_name}
-                                            </Typography>
-                                            <Typography
-                                                variant="body2"
-                                                sx={{ color: "text.secondary" }}
-                                            >
-                                                Price: ${product.pricing}
-                                            </Typography>
-                                            <hr/>
-                                        </Box>
-                                    ))}
+                                                <Typography
+                                                    variant="body1"
+                                                    fontWeight="bold"
+                                                    color="black"
+                                                >
+                                                    {product_name}
+                                                </Typography>
+                                                <Typography
+                                                    variant="body2"
+                                                    color="blue"
+                                                >
+                                                    Price: ${pricing}
+                                                </Typography>
+                                                <Divider
+                                                    sx={{
+                                                        mt: 1,
+                                                    }}
+                                                />
+                                            </Box>
+                                        ),
+                                    )}
                                 </>
                             )}
                         </Box>

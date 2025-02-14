@@ -18,11 +18,11 @@ type Stock = {
 };
 
 interface Props {
-    stocks: Stock[];
+    productList: Stock[];
     notifications: any;
 }
 
-const Test: React.FC<Props> = ({ stocks, notifications }) => {
+const Test: React.FC<Props> = ({ productList, notifications }) => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isEditPopupOpen, setEditIsPopupOpen] = useState(false);
     const [selected, setSelected] = useState<number[]>([]);
@@ -32,17 +32,21 @@ const Test: React.FC<Props> = ({ stocks, notifications }) => {
         useFetchProducts();
     const { categoriesData, categoryNames } = useFetchCategories();
 
+
     const handleAddProduct = (product: {
         productName: string;
         categoryId: number | undefined;
         pricing: number | null;
+        stocks: number | null;
     }) => {
         // Prepare payload for the backend
         const payload = {
             product_name: product.productName,
             category_id: product.categoryId, // Assuming `category` has an `id` field
             pricing: product.pricing,
+            stocks: product.stocks,
         };
+        console.log('payload',payload)
 
         // Send the payload to the backend using router.post
         axios
@@ -60,15 +64,11 @@ const Test: React.FC<Props> = ({ stocks, notifications }) => {
     };
 
     const productColumns = (product: any) => {
-        const productStock = stocks
-            .filter((stock) => stock.product_id === product.id) // Filter stocks for the current product
-            .reduce((total, stock) => total + stock.quantity, 0); // Sum up the quantities
-
         // Determine stock color based on the quantity
         const stockColor =
-            productStock >= 70
+            product.stocks >= 70
                 ? "text-green-500"
-                : productStock > 45
+                : product.stocks > 45
                   ? "text-orange-500"
                   : "text-red-500";
 
@@ -77,8 +77,8 @@ const Test: React.FC<Props> = ({ stocks, notifications }) => {
             product.product_name,
             getCategoryName(product.category_id),
             <span className={`font-bold ${stockColor}`}>
-                {productStock || "N/A"}
-            </span>, // Apply the color to the stock quantity
+                {product.stocks || "N/A"}
+            </span>,
             `₱ ${product.pricing || "N/A"}`,
         ];
     };
@@ -189,6 +189,10 @@ const Test: React.FC<Props> = ({ stocks, notifications }) => {
         window.location.href = "/products/export-csv";
     };
 
+    const handleDownloadTemplate = () => {
+        window.location.href = "/products/template";
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
             <Navbar />
@@ -283,11 +287,27 @@ const Test: React.FC<Props> = ({ stocks, notifications }) => {
                 />
             </div>
 
-            <Box sx={{ display: "flex", justifyContent: "flex-end", marginRight: 6,  marginBottom: 3 }}>
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    marginRight: 6,
+                    marginBottom: 3,
+                }}
+            >
+                <Button
+                    variant="outlined"
+                    color="inherit"
+                    onClick={handleDownloadTemplate}
+                    sx={{ margin: 2 }}
+                >
+                    Download Template
+                </Button>
                 <Button
                     variant="contained"
                     color="success"
                     onClick={handleDownload}
+                    sx={{ margin: 2 }}
                 >
                     Download as CSV
                 </Button>

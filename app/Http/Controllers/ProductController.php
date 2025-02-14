@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Inertia\Inertia;
+use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProductController extends Controller
@@ -13,14 +17,17 @@ class ProductController extends Controller
      public function index()
      {
 
-        if (request()->wantsJson()) {
-            return Product::all();
-        }
+         $products = Product::all();
+         if (request()->wantsJson()) {
+             return Product::all();
+         }
 
-        // Default Inertia response
-        return Inertia::render('test', [
-            'products' => Product::all(),
-        ]);
+
+         // Default Inertia response
+         return Inertia::render('test', [
+             'productList' => $products ,
+
+         ]);
 
      }
 
@@ -33,11 +40,14 @@ class ProductController extends Controller
      // Method to create a new product
      public function store(Request $request)
      {
+
          $validated = $request->validate([
              'product_name' => 'required|string|max:255',
              'category_id' => 'required|numeric',
              'pricing' => 'required|numeric',
+             'stocks'=> 'required|numeric',
          ]);
+
 
          $product = Product::create($validated); // Create and store the new product
          return response()->json($product, 201);  // Return the created product
@@ -103,5 +113,58 @@ class ProductController extends Controller
            $response->headers->set('Content-Disposition', 'attachment; filename="products.csv"');
 
          return $response;
+     }
+
+     public function downloadTemplate()
+     {
+        $categories = Category::pluck('category_name')->toArray();
+
+        // Create new Spreadsheet
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Add headers
+        $sheet->setCellValue('A1', 'Product Name');
+        $sheet->setCellValue('B1', 'Category');
+        $sheet->setCellValue('C1', 'Price');
+
+        // Example row
+        $sheet->setCellValue('A2', 'Sample Product');
+        $sheet->setCellValue('B2', '');
+        $sheet->setCellValue('C2', '0.00');
+
+        $categoryDropdown = implode(",", array_map(fn($c) => '"' . $c . '"', $categories));
+
+     // Apply dropdown to "Category" column (B2:B1000)
+        $validationCategory = new DataValidation();
+        $validationCategory->setType(DataValidation::TYPE_LIST);
+        $validationCategory->setErrorStyle(DataValidation::STYLE_STOP);
+        $validationCategory->setAllowBlank(false);
+        $validationCategory->setShowInputMessage(true);
+        $validationCategory->setShowErrorMessage(true);
+        $validationCategory->setFormula1('"' . $categoryDropdown . '"');
+
+        // Apply number validation to "Price" column (C2:C1000)
+          $validationPrice = new DataValidation();
+          $validationPrice->setType(DataValidation::TYPE_DECIMAL);
+          $validationPrice->setErrorStyle(DataValidation::STYLE_STOP);
+          $validationPrice->setAllowBlank(false);
+          $validationPrice->setShowInputMessage(true);
+          $validationPrice->setShowErrorMessage(true);
+          $validationPrice->setOperator(DataValidation::OPERATOR_GREATERTHAN);
+          $validationPrice->setFormula1('0'); // Only allow numbers >= 0
+
+        for ($row = 2; $row <= 1000; $row++) {
+            $sheet->getCell("B$row")->setDataValidation(clone $validationCategory);
+            $sheet->getCell("C$row")->setDataValidation(clone $validationPrice);
+        }
+
+        // Prepare file for download
+        $writer = new Xlsx($spreadsheet);
+        $fileName = "product_template.xlsx";
+        $tempFile = tempnam(sys_get_temp_dir(), $fileName);
+        $writer->save($tempFile);
+
+        return response()->download($tempFile, $fileName)->deleteFileAfterSend(true);
      }
 }

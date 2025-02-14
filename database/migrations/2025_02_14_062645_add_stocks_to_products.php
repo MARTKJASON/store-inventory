@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'email')) { // Prevent duplicate column issue
-                $table->string('email')->after('last_name')->notNull();
-            }
+        Schema::table('products', function (Blueprint $table) {
+            $table->integer('stocks');
         });
     }
 
@@ -23,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('email');
+        Schema::table('products', function (Blueprint $table) {
+            $table->dropColumn('stocks');
         });
     }
 };
