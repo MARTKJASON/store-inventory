@@ -60,6 +60,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/deposit', [DepositController::class, 'deposit'])->name('deposit');
 
     // Route::get('/stocks', [StockController::class, 'index'])->name('stocks.index');
+    Route::get('/products/export-csv', [ProductController::class, 'exportCsv'])->name('products.export');
 });
 
 

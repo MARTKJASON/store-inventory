@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../Components/Navbar.js";
 import TableComponent from "../Components/Table.js";
 import axios from "axios";
-import { Button, TextField } from "@mui/material";
+import { Box, Button, TextField } from "@mui/material";
 import useFetchProducts from "../Hooks/useFetchProducts.js";
 import AddProductDrawer from "../Components/AddProduct.js";
 import EditProductDrawer from "../Components/EditProduct.js";
@@ -19,12 +19,10 @@ type Stock = {
 
 interface Props {
     stocks: Stock[];
-    notifications: any
+    notifications: any;
 }
 
-
-
-const Test: React.FC<Props>  = ({stocks, notifications}) => {
+const Test: React.FC<Props> = ({ stocks, notifications }) => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isEditPopupOpen, setEditIsPopupOpen] = useState(false);
     const [selected, setSelected] = useState<number[]>([]);
@@ -33,9 +31,6 @@ const Test: React.FC<Props>  = ({stocks, notifications}) => {
     const { products, filteredProducts, setFilteredProducts, loading } =
         useFetchProducts();
     const { categoriesData, categoryNames } = useFetchCategories();
-
-
-
 
     const handleAddProduct = (product: {
         productName: string;
@@ -48,7 +43,6 @@ const Test: React.FC<Props>  = ({stocks, notifications}) => {
             category_id: product.categoryId, // Assuming `category` has an `id` field
             pricing: product.pricing,
         };
-
 
         // Send the payload to the backend using router.post
         axios
@@ -65,23 +59,27 @@ const Test: React.FC<Props>  = ({stocks, notifications}) => {
             });
     };
 
-
     const productColumns = (product: any) => {
         const productStock = stocks
-          .filter((stock) => stock.product_id === product.id) // Filter stocks for the current product
-          .reduce((total, stock) => total + stock.quantity, 0); // Sum up the quantities
+            .filter((stock) => stock.product_id === product.id) // Filter stocks for the current product
+            .reduce((total, stock) => total + stock.quantity, 0); // Sum up the quantities
 
         // Determine stock color based on the quantity
-        const stockColor = productStock >= 70 ? 'text-green-500' :
-                           productStock > 45 ? 'text-orange-500' :
-                           'text-red-500';
+        const stockColor =
+            productStock >= 70
+                ? "text-green-500"
+                : productStock > 45
+                  ? "text-orange-500"
+                  : "text-red-500";
 
         return [
-          product.id,
-          product.product_name,
-          getCategoryName(product.category_id),
-          <span className={`font-bold ${stockColor}`}>{productStock || "N/A"}</span>, // Apply the color to the stock quantity
-          `₱ ${product.pricing || "N/A"}`,
+            product.id,
+            product.product_name,
+            getCategoryName(product.category_id),
+            <span className={`font-bold ${stockColor}`}>
+                {productStock || "N/A"}
+            </span>, // Apply the color to the stock quantity
+            `₱ ${product.pricing || "N/A"}`,
         ];
     };
 
@@ -187,6 +185,10 @@ const Test: React.FC<Props>  = ({stocks, notifications}) => {
         }
     };
 
+    const handleDownload = () => {
+        window.location.href = "/products/export-csv";
+    };
+
     return (
         <div className="min-h-screen bg-gray-50">
             <Navbar />
@@ -280,6 +282,16 @@ const Test: React.FC<Props>  = ({stocks, notifications}) => {
                     sortFn={(a, b) => b.id - a.id}
                 />
             </div>
+
+            <Box sx={{ display: "flex", justifyContent: "flex-end", marginRight: 6,  marginBottom: 3 }}>
+                <Button
+                    variant="contained"
+                    color="success"
+                    onClick={handleDownload}
+                >
+                    Download as CSV
+                </Button>
+            </Box>
         </div>
     );
 };

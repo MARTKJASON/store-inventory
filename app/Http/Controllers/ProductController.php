@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProductController extends Controller
 {
@@ -74,5 +75,33 @@ class ProductController extends Controller
         ]);
 
         Product::whereIn('id', $request->ids)->delete();
+     }
+
+     public function exportCsv()
+     {
+        $products = Product::with('category')->select('id', 'product_name', 'category_id', 'pricing')->get();
+
+        $response = new StreamedResponse(function () use ($products) {
+            $handle = fopen('php://output', 'w');
+
+             // Add CSV headers
+        fputcsv($handle, ['Product ID', 'Product Name', 'Category', 'Price']);
+
+        // Add product data with category name
+            foreach ($products as $product) {
+                fputcsv($handle, [
+                    $product->id,
+                    $product->product_name,
+                    $product->category ? $product->category->category_name : 'No Category',
+                    $product->pricing
+                ]);
+            }
+
+            fclose($handle);
+          });
+           $response->headers->set('Content-Type', 'text/csv');
+           $response->headers->set('Content-Disposition', 'attachment; filename="products.csv"');
+
+         return $response;
      }
 }
