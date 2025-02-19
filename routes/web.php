@@ -34,7 +34,9 @@ Route::get('/auth', function () {
 });
 
 Route::post('/logout', [UserController::class, 'logout']);
-
+Route::get('/POS', function () {
+    return Inertia::render('POS');
+})->where('any', '.*');
 Route::middleware(['auth'])->group(function () {
     // Product-related routes
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');

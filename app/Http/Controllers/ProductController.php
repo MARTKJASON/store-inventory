@@ -89,13 +89,13 @@ class ProductController extends Controller
 
      public function exportCsv()
      {
-        $products = Product::with('category')->select('id', 'product_name', 'category_id', 'pricing')->get();
+        $products = Product::with('category')->select('id', 'product_name', 'category_id', 'stocks','pricing')->get();
 
         $response = new StreamedResponse(function () use ($products) {
             $handle = fopen('php://output', 'w');
 
              // Add CSV headers
-        fputcsv($handle, ['Product ID', 'Product Name', 'Category', 'Price']);
+        fputcsv($handle, ['Product ID', 'Product Name', 'Category', 'Stocks', 'Price']);
 
         // Add product data with category name
             foreach ($products as $product) {
@@ -103,6 +103,7 @@ class ProductController extends Controller
                     $product->id,
                     $product->product_name,
                     $product->category ? $product->category->category_name : 'No Category',
+                    $product->stocks,
                     $product->pricing
                 ]);
             }
@@ -126,12 +127,14 @@ class ProductController extends Controller
         // Add headers
         $sheet->setCellValue('A1', 'Product Name');
         $sheet->setCellValue('B1', 'Category');
-        $sheet->setCellValue('C1', 'Price');
+        $sheet->setCellValue('C1', 'Stocks');
+        $sheet->setCellValue('D1', 'Price');
 
         // Example row
         $sheet->setCellValue('A2', 'Sample Product');
         $sheet->setCellValue('B2', '');
         $sheet->setCellValue('C2', '0.00');
+        $sheet->setCellValue('D2', '0');
 
         $categoryDropdown = implode(",", array_map(fn($c) => '"' . $c . '"', $categories));
 
