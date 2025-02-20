@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -67,6 +68,37 @@ class ProductController extends Controller
          $product->update($validated); // Update the product with new data
          return response()->json($product);  // Return the updated product
      }
+
+     public function bulkUpdate(Request $request)
+    {
+        $validated = $request->validate([
+            'products' => 'required|array',
+            'products.*.id' => 'required|exists:products,id',
+            'products.*.quantity' => 'required|integer|min:1',
+        ]);
+
+
+        DB::transaction(function () use ($validated, &$totalSales) {
+            foreach ($validated['products'] as $product) {
+                $dbProduct = Product::find($product['id']); // Get product details
+
+                if ($dbProduct->stocks >= $product['quantity']) {
+                    // Deduct stock
+                    $dbProduct->decrement('stocks', $product['quantity']);
+
+                    // Calculate sales revenue
+                    $totalSales += $dbProduct->pricing * $product['quantity'];
+                }
+            }
+        });
+
+        return response()->json([
+            'message' => 'Stock updated successfully!',
+            'total_sales' => $totalSales, // Return the total sales
+        ]);
+    }
+
+
 
 
      // Method to delete a product

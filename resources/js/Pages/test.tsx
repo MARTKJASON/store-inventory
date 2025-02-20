@@ -65,14 +65,12 @@ const Test: React.FC<Props> = ({ productList, notifications }) => {
 
     const productColumns = (product: any) => {
         // Determine stock color and label based on the quantity
-        let stockLabel = "Normal";
+
         let stockColor = "text-blue-500";
 
         if (product.stocks >= 90) {
-            stockLabel = "High";
             stockColor = "text-green-500";
         } else if (product.stocks <= 20) {
-            stockLabel = "Low";
             stockColor = "text-red-500";
         }
 
@@ -80,7 +78,7 @@ const Test: React.FC<Props> = ({ productList, notifications }) => {
             product.id,
             product.product_name,
             getCategoryName(product.category_id),
-            <span className={`font-bold ${stockColor}`}>{stockLabel}</span>,
+            <span className={`font-bold ${stockColor}`}>{product.stocks}</span>,
             `₱ ${product.pricing || "N/A"}`,
         ];
     };

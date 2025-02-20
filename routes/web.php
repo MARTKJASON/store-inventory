@@ -37,6 +37,8 @@ Route::post('/logout', [UserController::class, 'logout']);
 Route::get('/POS', function () {
     return Inertia::render('POS');
 })->where('any', '.*');
+Route::post('/products/bulk-update', [ProductController::class, 'bulkUpdate'])->name('products.bulk-update');
+
 Route::middleware(['auth'])->group(function () {
     // Product-related routes
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
