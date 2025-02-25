@@ -43,13 +43,20 @@ class UserController extends Controller
             'password' => 'required',
         ]);
 
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
         // Attempt login
         if (Auth::attempt($credentials)) {
             // Regenerate session ID after successful login
             $request->session()->regenerate();
-
+            $user = Auth::user();
             // Return a success response
-            return response()->json(['message' => 'Login successful'], 200);
+            return response()->json([
+                'message' => 'Login successful',
+                'redirect' => $user->is_admin ? '/products' : '/POS'
+            ]);
         }
 
         // If authentication fails, return a 401 Unauthorized response

@@ -15,6 +15,7 @@ import {
 import { styled } from "@mui/system";
 import { FaEye, FaEyeSlash, FaUserPlus } from "react-icons/fa";
 import axios from "axios";
+import { Inertia } from "@inertiajs/inertia";
 
 const StyledForm = styled(Box)<{ component?: React.ElementType }>(
     ({ theme }) => ({
@@ -117,12 +118,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({handleLogin}) => {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        console.log(formData)
         if (validateForm()) {
             setIsLoading(true);
             try {
                 await axios.post("/auth/register", formData);
                 alert("Registration successful!");
+                Inertia.visit("/login");
             } catch (error) {
                 console.error("Error during registration:", error);
             } finally {

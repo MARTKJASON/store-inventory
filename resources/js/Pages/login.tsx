@@ -99,29 +99,43 @@ const LoginForm: React.FC = () => {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        console.log(formData);
 
         if (validateForm()) {
             setIsLoading(true);
             try {
-                // Ensure CSRF token is included in the header
+                // Send login request
                 const response = await axios.post("/loginUser", formData);
+
                 if (response.status === 200) {
-                  await  axios.post('/send-welcome-notification');
-                    Inertia.visit("/products");
+                    const redirectUrl = response.data.redirect || "/POS"; // Default to POS if no redirect given
+
+                    // await axios.post("/send-welcome-notification");
+
+                    // Ensure the redirect happens correctly
+                    setTimeout(() => {
+                        Inertia.visit(redirectUrl);
+                    }, 100);
                 }
             } catch (error: any) {
-                console.error("Error during registration:", error);
-                if (error.response.status === 401) {
-                    alert("Incorrect Log in");
-                } else if (error.response && error.response.status === 422) {
-                    alert("Validation failed. Please check your input.");
+                console.error("Error during login:", error);
+
+                if (error.response) {
+                    if (error.response.status === 401) {
+                        alert("Incorrect login credentials.");
+                    } else if (error.response.status === 422) {
+                        alert("Validation failed. Please check your input.");
+                    } else {
+                        alert("An error occurred. Please try again.");
+                    }
+                } else {
+                    alert("Network error. Please check your connection.");
                 }
             } finally {
                 setIsLoading(false);
             }
         }
     };
+
 
     return (
         <LoginContainer maxWidth="xl">

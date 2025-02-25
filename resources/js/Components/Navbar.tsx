@@ -9,7 +9,7 @@ const Navbar = () => {
         { name: "Stocks", route: "/stocks", method: "get" },
         { name: "Categories", route: "/categories", method: "get" },
         { name: "Suppliers", route: "/suppliers", method: "get" },
-        { name: "Customers", route: "/customers", method: "get" },
+        { name: "Sales Report", route: "/sales-report", method: "get" },
         { name: "Notifications", route: "/notifications", method: "get" },
         { name: "Settings", route: "/settings", method: "get" },
     ];

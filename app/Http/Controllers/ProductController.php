@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Sale;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
@@ -77,24 +78,30 @@ class ProductController extends Controller
             'products.*.quantity' => 'required|integer|min:1',
         ]);
 
-
+        $totalSales = 0;
         DB::transaction(function () use ($validated, &$totalSales) {
             foreach ($validated['products'] as $product) {
-                $dbProduct = Product::find($product['id']); // Get product details
+                $dbProduct = Product::find($product['id']);
 
                 if ($dbProduct->stocks >= $product['quantity']) {
-                    // Deduct stock
                     $dbProduct->decrement('stocks', $product['quantity']);
+                    $saleAmount = $dbProduct->pricing * $product['quantity'];
+                    $totalSales += $saleAmount;
 
-                    // Calculate sales revenue
-                    $totalSales += $dbProduct->pricing * $product['quantity'];
+                    // Store in sales table
+                    Sale::create([
+                        'product_id' => $product['id'],
+                        'quantity' => $product['quantity'],
+                        'total_price' => $saleAmount,
+                        'user_id' => auth()->id()
+                    ]);
                 }
             }
         });
 
         return response()->json([
             'message' => 'Stock updated successfully!',
-            'total_sales' => $totalSales, // Return the total sales
+            'total_sales' => $totalSales,
         ]);
     }
 

@@ -4,12 +4,14 @@ import { Card, CardContent } from "../Components/ui/Card";
 import { motion } from "framer-motion";
 import useFetchProducts from "../Hooks/useFetchProducts";
 import useBulkUpdateProducts from "../Hooks/useBulkUpdateProducts";
+import useFetchCurrentUsers from "../Hooks/useFetchCurrentUser";
 
 const POS: React.FC = () => {
     const [cart, setCart] = useState<{ id: number; product_name: string; pricing: number; quantity: number }[]>([]);
     const [total, setTotal] = useState(0);
   const {products} = useFetchProducts()
  const {updateStock} = useBulkUpdateProducts(products)
+ const { user, loading } = useFetchCurrentUsers();
 
   useEffect(() => {
     const newTotal = cart.reduce((sum, item) => sum + item.pricing * item.quantity, 0);
@@ -60,13 +62,13 @@ const POS: React.FC = () => {
     <div className="p-6 min-h-screen bg-gray-100 grid grid-cols-2 gap-4">
       {/* Product List */}
       <div>
-        <h1 className="text-2xl font-bold mb-4">Point of Sale System</h1>
+        <h1 className="text-2xl font-bold mb-4">Point of Sale System<span className="text-[17px] text-blue-500 font-semibold m-5"> - {user?.last_name} {user?.first_name}{" "}</span></h1>
         <div className="grid grid-cols-2 gap-4">
           {products.map((product, index) => (
             <Card key={index} className="p-4 shadow-lg cursor-pointer" >
               <CardContent>
                 <h2 className="text-lg font-semibold">{product.product_name}</h2>
-                <p className="text-gray-600">₱{product.pricing}</p>
+                <p className="text-gray-800">₱{product.pricing}</p>
                 <Button
                   variant="contained"
                   color="primary"

@@ -46,7 +46,7 @@ const Test: React.FC<Props> = ({ productList, notifications }) => {
             pricing: product.pricing,
             stocks: product.stocks,
         };
-        console.log('payload',payload)
+
 
         // Send the payload to the backend using router.post
         axios
